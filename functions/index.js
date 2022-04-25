@@ -28,7 +28,11 @@ app.get('/api/movies', async (req, res) => {
     const response = docs.map(doc => ({
       id: doc.id,
       name: doc.data().name,
-      description: doc.data().description
+      description: doc.data().description,
+      category: doc.data().category,
+      studio: doc.data().studio,
+      url: doc.data().url,
+      img: doc.data().img
     }))
     return res.status(200).json(response)
   }catch(e){
@@ -51,7 +55,11 @@ app.post('/api/movies', async (req, res) => {
   try{
     await db.collection('movies').add({ 
       name: req.body.name, 
-      description: req.body.description 
+      description: req.body.description,
+      category: req.body.category,
+      studio: req.body.studio,
+      url: req.body.url,
+      img: req.body.img
     })
     return res.status(201).json()
   }catch(e){
@@ -64,7 +72,11 @@ app.put('/api/movies/:id', async (req,res) => {
     const doc = db.collection('movies').doc(req.params.id)
     await doc.update({ 
       name: req.body.name, 
-      description: req.body.description 
+      description: req.body.description,
+      category: req.body.category,
+      studio: req.body.studio,
+      url: req.body.url,
+      img: req.body.img
     })
     return res.status(200).json()
   } catch (e){
@@ -90,7 +102,8 @@ app.get('/api/categories', async (req, res) => {
     const response = docs.map(doc => ({
       id: doc.id,
       name: doc.data().name,
-      description: doc.data().description
+      description: doc.data().description,
+      img: doc.data().img
     }))
     return res.status(200).json(response)
   }catch(e){
@@ -113,7 +126,8 @@ app.post('/api/categories', async (req, res) => {
   try{
     await db.collection('categories').add({ 
       name: req.body.name, 
-      description: req.body.description 
+      description: req.body.description,
+      img: req.body.img
     })
     return res.status(201).json()
   }catch(e){
@@ -126,7 +140,8 @@ app.put('/api/categories/:id', async (req,res) => {
     const doc = db.collection('categories').doc(req.params.id)
     await doc.update({ 
       name: req.body.name, 
-      description: req.body.description 
+      description: req.body.description,
+      img: req.body.img
     })
     return res.status(200).json()
   } catch (e){
@@ -152,7 +167,8 @@ app.get('/api/studios', async (req, res) => {
     const response = docs.map(doc => ({
       id: doc.id,
       name: doc.data().name,
-      description: doc.data().description
+      description: doc.data().description,
+      img: doc.data().img
     }))
     return res.status(200).json(response)
   }catch(e){
@@ -175,7 +191,8 @@ app.post('/api/studios', async (req, res) => {
   try{
     await db.collection('studios').add({ 
       name: req.body.name, 
-      description: req.body.description 
+      description: req.body.description,
+      img: req.body.img
     })
     return res.status(201).json()
   }catch(e){
@@ -188,7 +205,8 @@ app.put('/api/studios/:id', async (req,res) => {
     const doc = db.collection('studios').doc(req.params.id)
     await doc.update({ 
       name: req.body.name, 
-      description: req.body.description 
+      description: req.body.description,
+      img: req.body.img
     })
     return res.status(200).json()
   } catch (e){
@@ -202,6 +220,50 @@ app.delete('/api/studios/:id', async (req,res) => {
     await doc.delete()
     return res.status(200).json()
   } catch (e) {
+    return res.status(500).send(e)
+  }
+})
+
+app.get('/api/studio-movies/:id', async (req, res) => {
+  try{
+    const doc = db.collection('studios').doc(req.params.id)
+    const category = await doc.get()
+    const name = category.data().name
+    const query = await db.collection('movies').where('studio','==', name).get()
+    const docs = query.docs
+    const response = docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+      description: doc.data().description,
+      category: doc.data().category,
+      studio: doc.data().studio,
+      url: doc.data().url,
+      img: doc.data().img
+    }))
+    return res.status(200).json(response)
+  }catch (e){
+    return res.status(500).send(e)
+  }
+})
+
+app.get('/api/category-movies/:id', async (req, res) => {
+  try{
+    const doc = db.collection('categories').doc(req.params.id)
+    const category = await doc.get()
+    const name = category.data().name
+    const query = await db.collection('movies').where('category','==', name).get()
+    const docs = query.docs
+    const response = docs.map(doc => ({
+      id: doc.id,
+      name: doc.data().name,
+      description: doc.data().description,
+      category: doc.data().category,
+      studio: doc.data().studio,
+      url: doc.data().url,
+      img: doc.data().img
+    }))
+    return res.status(200).json(response)
+  }catch (e){
     return res.status(500).send(e)
   }
 })
